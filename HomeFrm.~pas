@@ -28,9 +28,15 @@ type
     edtNome: TEdit;
     btnSalvar: TButton;
     btnCancelar: TButton;
-    cbbPai: TDBComboBox;
     lblNome: TLabel;
     lblCategoria: TLabel;
+    cbbPai: TComboBox;
+    qryPesquisas: TIBCQuery;
+    qryPesquisasCD_GRUPO: TIntegerField;
+    qryPesquisasNR_CONTA: TStringField;
+    qryPesquisasDS_GRUPO: TStringField;
+    qryPesquisasCD_PAI: TIntegerField;
+    btnRelatorio: TButton;
     procedure ativarBotoesAlteracao(value:boolean);
     procedure btnAdicionarClick(Sender: TObject);
     procedure btnSalvarClick(Sender: TObject);
@@ -41,6 +47,8 @@ type
     procedure ativarBotoesDML(value:boolean);
     procedure btnExcluirClick(Sender: TObject);
     procedure trlDadosClick(Sender: TObject);
+    procedure preencheComboBox;
+    procedure btnRelatorioClick(Sender: TObject);
   private
     mode:integer;
   public
@@ -53,6 +61,9 @@ var
 implementation
 
 {$R *.dfm}
+
+uses
+  filtroRelatorioFrm;
 
 procedure TForm1.ativarBotoesAlteracao(value:boolean);
 begin
@@ -78,13 +89,20 @@ begin
   ativaInputs(true);
   mode:=0;
   ativarBotoesDML(false);
+  preencheComboBox;
+end;
 
-  while not qryGrupo.Eof do
+procedure TForm1.preencheComboBox;
+begin
+  cbbPai.Items.Clear;
+  qryPesquisas.SQL.Text := 'select * from grupo;';
+  qryPesquisas.Open;
+  qryPesquisas.First;
+  while not qryPesquisas.Eof do
   begin
-     cbbPai.Items.Add(qryGrupoDS_GRUPO.value);
-     qryGrupo.Next;
+     cbbPai.Items.Add(qryPesquisasDS_GRUPO.value);
+     qryPesquisas.Next;
   end;
-  
 end;
 
 procedure TForm1.btnSalvarClick(Sender: TObject);
@@ -93,18 +111,19 @@ valorcbb:string;
 codPai:integer;
 begin
   try
-  valorcbb := cbbPai.Field.Value;
-  qryGrupo.SQL.Text := 'SELECT * FROM GRUPO  where DS_GRUPO = :nome;';
-  qryGrupo.ParamByName('nome').AsString := valorCbb;
-  qryGrupo.Open;
+  valorcbb := cbbPai.Text;
+  qryPesquisas.SQL.Text := 'SELECT * FROM GRUPO  where DS_GRUPO = :nome;';
+  qryPesquisas.ParamByName('nome').AsString := valorCbb;
+  qryPesquisas.Open;
 
-  codPai:=qryGrupoCD_GRUPO.Value;
+  codPai:=qryPesquisasCD_GRUPO.Value;
 
   if mode = 0 then
     qryGrupo.Insert
   else
     qryGrupo.Edit;
 
+  showmessage(IntToStr(qryGrupoCD_GRUPO.Value));
   qryGrupoNR_CONTA.AsString := '0.0';
   qryGrupoDS_GRUPO.AsString := edtNome.text;
   qryGrupoCD_PAI.AsInteger := codPai;
@@ -145,11 +164,21 @@ begin
   ativaInputs(true);
   mode:=1;
   ativarBotoesDML(false);
+  preencheComboBox;
 end;
 
 procedure TForm1.btnExcluirClick(Sender: TObject);
 begin
-  ativarBotoesDML(false);
+  if MessageDlg('Você tem certeza?', mtConfirmation, [mbYes, mbNo], 0) = mrYes then
+  begin
+    try
+      qryGrupo.delete;
+      qryGrupo.Transaction.CommitRetaining;
+    except
+      qryGrupo.Transaction.RollbackRetaining;
+    end;
+  end;
+
 end;
 
 procedure TForm1.trlDadosClick(Sender: TObject);
@@ -158,9 +187,19 @@ codPai:integer;
 begin
   edtNome.Text := qryGrupoDS_GRUPO.Value;
   codPai:= qryGrupoCD_PAI.value;
-  qryGrupo.SQL.Text := 'SELECT * FROM GRUPO  where CD_GRUPO = :pai;';
-  qryGrupo.ParamByName('pai').AsInteger := codpai;
-  qryGrupo.Open;
+  if not (codPai = 0) then
+  begin
+    qryPesquisas.SQL.Text := 'SELECT * FROM GRUPO  where CD_GRUPO = :pai;';
+    qryPesquisas.ParamByName('pai').AsInteger := qryGrupoCD_PAI.value;
+    qryPesquisas.Open;
+    cbbPai.Text := qryPesquisasDS_GRUPO.value;
+  end;
+end;
+
+procedure TForm1.btnRelatorioClick(Sender: TObject);
+begin
+  application.CreateForm(TfrmFiltroRelatorio, frmFiltroRelatorio);
+  frmFiltroRelatorio.ShowModal;
 end;
 
 end.

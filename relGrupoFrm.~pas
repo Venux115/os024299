@@ -1,0 +1,29 @@
+unit relGrupoFrm;
+
+interface
+
+uses
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
+  Dialogs, DB, DBAccess, IBC, ExtCtrls, QuickRpt;
+
+type
+  TdlgRelGrupoForm = class(TForm)
+    QuickRep1: TQuickRep;
+    srcRelGrupo: TIBCDataSource;
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  dlgRelGrupoForm: TdlgRelGrupoForm;
+
+implementation
+
+{$R *.dfm}
+
+uses
+  dlgFiltroGrupoForm;
+
+end.

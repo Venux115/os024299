@@ -1,6 +1,6 @@
 object Form1: TForm1
-  Left = 362
-  Top = 252
+  Left = 358
+  Top = 239
   Width = 1221
   Height = 712
   Caption = 'Form1'
@@ -63,15 +63,14 @@ object Form1: TForm1
       TabOrder = 2
       OnClick = btnCancelarClick
     end
-    object cbbPai: TDBComboBox
+    object cbbPai: TComboBox
       Left = 64
       Top = 152
       Width = 145
       Height = 21
-      DataField = 'DS_GRUPO'
-      DataSource = srcGrupo
       ItemHeight = 13
       TabOrder = 3
+      Text = 'cbbPai'
     end
   end
   object pnlTabela: TPanel
@@ -147,6 +146,15 @@ object Form1: TForm1
       TabOrder = 2
       OnClick = btnExcluirClick
     end
+    object btnRelatorio: TButton
+      Left = 376
+      Top = 8
+      Width = 75
+      Height = 25
+      Caption = 'Relat'#243'rio'
+      TabOrder = 3
+      OnClick = btnRelatorioClick
+    end
   end
   object connection: TIBCConnection
     Database = 
@@ -190,5 +198,26 @@ object Form1: TForm1
     DataSet = qryGrupo
     Left = 19
     Top = 608
+  end
+  object qryPesquisas: TIBCQuery
+    SQL.Strings = (
+      'Select * from grupo')
+    Left = 176
+    Top = 609
+    object qryPesquisasCD_GRUPO: TIntegerField
+      FieldName = 'CD_GRUPO'
+      Required = True
+    end
+    object qryPesquisasNR_CONTA: TStringField
+      FieldName = 'NR_CONTA'
+      Required = True
+    end
+    object qryPesquisasDS_GRUPO: TStringField
+      FieldName = 'DS_GRUPO'
+      Size = 60
+    end
+    object qryPesquisasCD_PAI: TIntegerField
+      FieldName = 'CD_PAI'
+    end
   end
 end

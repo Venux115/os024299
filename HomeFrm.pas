@@ -63,7 +63,7 @@ implementation
 {$R *.dfm}
 
 uses
-  filtroRelatorioFrm;
+  dlgFiltroGrupoForm;
 
 procedure TForm1.ativarBotoesAlteracao(value:boolean);
 begin
